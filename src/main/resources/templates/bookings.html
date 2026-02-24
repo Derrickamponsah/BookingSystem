@@ -126,12 +126,17 @@
                                             <form th:if="${booking.status != 'CANCELLED'}"
                                                 th:action="@{/dashboard/bookings/{id}/cancel(id=${booking.id})}"
                                                 method="post"
-                                                onsubmit="return confirm('Are you sure you want to cancel this booking?')">
-                                                <button type="submit" class="btn btn-danger btn-sm"
-                                                    th:id="'cancelBtn-' + ${booking.id}">
-                                                    Cancel
-                                                </button>
+                                                th:id="'cancelForm-' + ${booking.id}"
+                                                style="display: none;">
                                             </form>
+                                            <button th:if="${booking.status != 'CANCELLED'}"
+                                                type="button"
+                                                class="btn btn-danger btn-sm"
+                                                th:data-booking-id="${booking.id}"
+                                                th:data-facility-name="${booking.facility.name}"
+                                                onclick="openCancelModal(this)">
+                                                Cancel
+                                            </button>
                                             <span th:if="${booking.status == 'CANCELLED'}"
                                                 style="color: var(--text-muted); font-size: 13px;">—</span>
                                         </td>
@@ -144,6 +149,68 @@
             </div>
         </main>
     </div>
+
+    <!-- Custom Cancel Booking Modal -->
+    <div id="cancelModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cancel Booking</h2>
+                <button type="button" class="modal-close" onclick="closeCancelModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this booking?</p>
+                <p><strong id="facilityNameDisplay"></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeCancelModal()">No, Keep it</button>
+                <button type="button" class="btn btn-danger" onclick="submitCancelForm()">Yes, Cancel Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentBookingId = '';
+
+        function openCancelModal(button) {
+            currentBookingId = button.getAttribute('data-booking-id');
+            const facilityName = button.getAttribute('data-facility-name');
+            document.getElementById('facilityNameDisplay').textContent = facilityName;
+            document.getElementById('cancelModal').style.display = 'flex';
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancelModal').style.display = 'none';
+            currentBookingId = '';
+        }
+
+        function submitCancelForm() {
+            if (currentBookingId) {
+                const form = document.getElementById('cancelForm-' + currentBookingId);
+                if (form) {
+                    form.submit();
+                } else {
+                    alert('Error: Could not find the booking form.');
+                }
+            }
+        }
+
+        // Close modal when clicking outside
+        const modal = document.getElementById('cancelModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCancelModal();
+                }
+            });
+        }
+
+        // Show success alert if redirected from cancel
+        if (window.location.search.includes('cancelled=true')) {
+            setTimeout(function() {
+                alert('✅ Booking successfully cancelled!');
+            }, 500);
+        }
+    </script>
 </body>
 
 </html>

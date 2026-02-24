@@ -141,6 +141,7 @@ public class PageController {
         try {
             bookingService.cancelBooking(id);
             redirectAttributes.addFlashAttribute("success", "Booking cancelled successfully.");
+            redirectAttributes.addAttribute("cancelled", "true");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
