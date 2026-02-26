@@ -81,13 +81,39 @@
                         <form th:action="@{/dashboard/facilities/{id}/availability(id=${facility.id})}" method="get"
                             style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
                             <label style="font-weight: 600; font-size: 14px;">📅 Select Date:</label>
-                            <input type="date" name="date" class="form-control" style="max-width: 220px;"
-                                th:value="${selectedDate}" id="dateSelector">
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <input type="date" name="date" class="form-control" style="padding: 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 14px;"
+                                    th:value="${selectedDate}" id="dateSelector">
+                                <small style="color: #666; font-size: 12px;">
+                                    📌 Book up to 90 days in advance
+                                </small>
+                            </div>
                             <button type="submit" class="btn btn-primary btn-sm" id="checkAvailabilityBtn">Check
                                 Availability</button>
                         </form>
                     </div>
                 </div>
+
+                <script>
+                    // Initialize date picker constraints
+                    const dateSelector = document.getElementById('dateSelector');
+                    const today = new Date();
+                    
+                    // Set minimum date to today
+                    const minDate = new Date(today);
+                    minDate.setHours(0, 0, 0, 0);
+                    dateSelector.min = minDate.toISOString().split('T')[0];
+                    
+                    // Set maximum date to 90 days from today
+                    const maxDate = new Date(today);
+                    maxDate.setDate(maxDate.getDate() + 90);
+                    dateSelector.max = maxDate.toISOString().split('T')[0];
+                    
+                    // If no date is selected (page loaded without query param), set today as default
+                    if (!dateSelector.value) {
+                        dateSelector.value = minDate.toISOString().split('T')[0];
+                    }
+                </script>
 
                 <!-- Legend -->
                 <div style="display: flex; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; font-size: 13px;">
